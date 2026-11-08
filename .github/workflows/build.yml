@@ -6,17 +6,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    container:
+      image: ps3dev/psl1ght:latest
     steps:
       - uses: actions/checkout@v4
-      - name: Instalar tudo e compilar
+      - name: Compilar jogo
         run: |
-          sudo apt-get update
-          sudo apt-get install -y git make wget python3 build-essential texinfo bison flex gettext libgmp-dev libmpfr-dev libmpc-dev libssl-dev
-          export PSL1GHT=$HOME/psl1ght
-          git clone https://github.com/psl1ght/psl1ght-toolchain.git $HOME/toolchain
-          cd $HOME/toolchain
-          sudo ./toolchain.sh
-          cd $GITHUB_WORKSPACE
+          export PSL1GHT=/usr/local/psl1ght
           export PATH=$PSL1GHT/ppu/bin:$PSL1GHT/host/bin:$PATH
           make pkg
           ls -lh *.pkg
