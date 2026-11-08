@@ -13,10 +13,8 @@ include $(PS3DEV)/make/ppu.mk
 SOURCE		:= .
 OBJS		:= main.o
 
-# Adicionado as bibliotecas de vídeo e controle necessárias do PS3
 LIBS		+= -lrsx -lsysutil -lio
 CFLAGS		+= -O2 -Wall
-INCLUDES	+= 
 
 .PHONY: all clean
 
