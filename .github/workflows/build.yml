@@ -8,18 +8,31 @@ on:
 
 jobs:
   build_ps3:
-    runs-on: ubuntu-latest
-    # Adicionamos opções para o container rodar como root e evitar o erro de inicialização
-    container:
-      image: ps3dev/ps3dev:latest
-      options: --user root
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout do codigo
       uses: actions/checkout@v4
 
+    - name: Instalar Dependencias do Sistema
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y autoconf automake bison flex g++ libelf-dev make texinfo wget zlib1g-dev libncurses5-dev patch bzip2 python3 python3-pip
+
+    - name: Baixar e Configurar PS3 Toolchain Pré-Compilada
+      run: |
+        # Baixa uma versão estável e pronta da toolchain diretamente do repositório oficial
+        wget https://github.com || wget https://github.com
+        sudo tar -xzf ps3dev-ubuntu-22.04.tar.gz -C /
+        
+        # Configura as variáveis de ambiente necessárias que o seu Makefile pede
+        echo "PS3DEV=/usr/local/ps3dev" >> $GITHUB_ENV
+        echo "/usr/local/ps3dev/bin" >> $GITHUB_PATH
+        echo "/usr/local/ps3dev/ppu/bin" >> $GITHUB_PATH
+
     - name: Compilar o Jogo (.pkg)
       run: |
+        # Agora o comando 'make' vai rodar encontrando todos os caminhos configurados acima
         make
 
     - name: Guardar o instalavel (Artefato)
