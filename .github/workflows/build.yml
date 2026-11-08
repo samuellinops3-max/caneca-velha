@@ -8,22 +8,31 @@ on:
 
 jobs:
   build_ps3:
-    runs-on: ubuntu-latest
-    # Usando a imagem mantida pela comunidade homebrew atual que roda direto no GitHub
-    container:
-      image: ghcr.io/ps3dev/ps3dev:master
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout do codigo
       uses: actions/checkout@v4
 
+    - name: Instalar Dependencias Basicas
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y make wget python3
+
+    - name: Baixar SDK do PS3 (PSL1GHT)
+      run: |
+        # Baixa os binários direto do repositório oficial de releases da comunidade
+        wget https://github.com
+        sudo tar -xzf ps3dev-ubuntu-22.04.tar.gz -C /
+        
+        # Injeta as variáveis de ambiente necessárias no fluxo do GitHub
+        echo "PS3DEV=/usr/local/ps3dev" >> $GITHUB_ENV
+        echo "PSL1GHT=/usr/local/ps3dev" >> $GITHUB_ENV
+        echo "/usr/local/ps3dev/bin" >> $GITHUB_PATH
+        echo "/usr/local/ps3dev/ppu/bin" >> $GITHUB_PATH
+
     - name: Compilar o Jogo (.pkg)
       run: |
-        # Configura as variáveis locais caso o container precise reforçar os caminhos
-        export PS3DEV=/usr/local/ps3dev
-        export PSL1GHT=$PS3DEV
-        export PATH=$PATH:$PS3DEV/bin:$PS3DEV/ppu/bin
-        
         make
 
     - name: Guardar o instalavel (Artefato)
