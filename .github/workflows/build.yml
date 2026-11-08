@@ -9,23 +9,18 @@ on:
 jobs:
   build_ps3:
     runs-on: ubuntu-latest
+    container: ghcr.io/ps3dev/ps3dev:master
 
     steps:
     - name: Checkout do codigo
       uses: actions/checkout@v4
 
-    - name: Instalar Compilador Nativo
+    - name: Compilar o Jogo (.pkg)
       run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc make
+        make
 
-    - name: Compilar Código Fonte
-      run: |
-        # Compila seu arquivo main.c diretamente sem depender de links externos
-        gcc main.c -o CupheadVelhoPS3 -O2
-
-    - name: Guardar o executavel (Artefato)
+    - name: Guardar o instalavel (Artefato)
       uses: actions/upload-artifact@v4
       with:
-        name: CupheadVelho-Build
-        path: CupheadVelhoPS3
+        name: CupheadVelho-PS3-PKG
+        path: "*.pkg"
