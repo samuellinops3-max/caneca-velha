@@ -6,15 +6,38 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/bucanero/pkgi-ps3:latest
     steps:
       - uses: actions/checkout@v4
+      - name: Instalar compilador PowerPC + PSL1GHT
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git make wget python3 gcc-powerpc64-linux-gnu binutils-powerpc64-linux-gnu zlib1g-dev
+          sudo mkdir -p /usr/local/ps3dev/psl1ght
+          sudo chown -R $USER:$USER /usr/local/ps3dev
+          export PS3DEV=/usr/local/ps3dev
+          export PSL1GHT=$PS3DEV/psl1ght
+          echo "PS3DEV=/usr/local/ps3dev" >> $GITHUB_ENV
+          echo "PSL1GHT=/usr/local/ps3dev/psl1ght" >> $GITHUB_ENV
+          echo "/usr/local/ps3dev/psl1ght/ppu/bin:/usr/local/ps3dev/bin" >> $GITHUB_PATH
+          # Cria os comandos ppu-* apontando pro gcc do Ubuntu
+          mkdir -p $PSL1GHT/ppu/bin $PS3DEV/bin
+          ln -sf /usr/bin/powerpc64-linux-gnu-gcc $PSL1GHT/ppu/bin/ppu-gcc
+          ln -sf /usr/bin/powerpc64-linux-gnu-g++ $PSL1GHT/ppu/bin/ppu-g++
+          ln -sf /usr/bin/powerpc64-linux-gnu-ld $PSL1GHT/ppu/bin/ppu-ld
+          ln -sf /usr/bin/powerpc64-linux-gnu-ar $PSL1GHT/ppu/bin/ppu-ar
+          ln -sf /usr/bin/powerpc64-linux-gnu-objcopy $PSL1GHT/ppu/bin/ppu-objcopy
+          ln -sf /usr/bin/powerpc64-linux-gnu-strip $PSL1GHT/ppu/bin/ppu-strip
+          # Baixa o PSL1GHT e instala as libs e as ferramentas de PKG
+          git clone https://github.com/ps3dev/PSL1GHT.git /tmp/PSL1GHT
+          cd /tmp/PSL1GHT
+          make install-ctrl
+          make install
+          ls $PSL1GHT/ppu/bin/
       - name: Compilar jogo
         run: |
           export PS3DEV=/usr/local/ps3dev
           export PSL1GHT=$PS3DEV/psl1ght
-          export PATH=$PS3DEV/bin:$PSL1GHT/ppu/bin:$PSL1GHT/host/bin:$PATH
+          export PATH=$PSL1GHT/ppu/bin:$PS3DEV/bin:$PATH
           make pkg
           ls -lh *.pkg
       - name: Salvar PKG
