@@ -9,7 +9,10 @@ on:
 jobs:
   build_ps3:
     runs-on: ubuntu-latest
-    container: ps3dev/ps3dev:latest
+    # Adicionamos opções para o container rodar como root e evitar o erro de inicialização
+    container:
+      image: ps3dev/ps3dev:latest
+      options: --user root
 
     steps:
     - name: Checkout do codigo
