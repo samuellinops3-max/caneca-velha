@@ -8,28 +8,14 @@ on:
 
 jobs:
   build_ps3:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout do codigo
       uses: actions/checkout@v4
 
-    - name: Instalar Dependencias Basicas
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y make wget python3
-
-    - name: Baixar SDK do PS3 (PSL1GHT)
-      run: |
-        # Baixa os binários direto do repositório oficial de releases da comunidade
-        wget https://github.com
-        sudo tar -xzf ps3dev-ubuntu-22.04.tar.gz -C /
-        
-        # Injeta as variáveis de ambiente necessárias no fluxo do GitHub
-        echo "PS3DEV=/usr/local/ps3dev" >> $GITHUB_ENV
-        echo "PSL1GHT=/usr/local/ps3dev" >> $GITHUB_ENV
-        echo "/usr/local/ps3dev/bin" >> $GITHUB_PATH
-        echo "/usr/local/ps3dev/ppu/bin" >> $GITHUB_PATH
+    - name: Configurar PS3DEV SDK
+      uses: ps3dev/setup-ps3dev@master
 
     - name: Compilar o Jogo (.pkg)
       run: |
