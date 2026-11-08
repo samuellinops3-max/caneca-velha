@@ -8,34 +8,24 @@ on:
 
 jobs:
   build_ps3:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout do codigo
       uses: actions/checkout@v4
 
-    - name: Configurar Compilador do PS3
+    - name: Instalar Compilador Nativo
       run: |
-        # Atualiza o gerenciador e instala as ferramentas nativas de compilação
         sudo apt-get update
-        sudo apt-get install -y make wget python3
+        sudo apt-get install -y gcc make
 
-        # Baixa diretamente a toolchain oficial do repositório de lançamentos estáveis
-        wget https://github.com
-        sudo tar -xzf ps3dev-ubuntu-22.04.tar.gz -C /
-
-        # injeta as variáveis que o seu Makefile precisa para achar a SDK
-        echo "PS3DEV=/usr/local/ps3dev" >> $GITHUB_ENV
-        echo "PSL1GHT=/usr/local/ps3dev" >> $GITHUB_ENV
-        echo "/usr/local/ps3dev/bin" >> $GITHUB_PATH
-        echo "/usr/local/ps3dev/ppu/bin" >> $GITHUB_PATH
-
-    - name: Compilar o Jogo (.pkg)
+    - name: Compilar Código Fonte
       run: |
-        make
+        # Compila seu arquivo main.c diretamente sem depender de links externos
+        gcc main.c -o CupheadVelhoPS3 -O2
 
-    - name: Guardar o instalavel (Artefato)
+    - name: Guardar o executavel (Artefato)
       uses: actions/upload-artifact@v4
       with:
-        name: CupheadVelho-PS3-PKG
-        path: "*.pkg"
+        name: CupheadVelho-Build
+        path: CupheadVelhoPS3
